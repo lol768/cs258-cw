@@ -92,5 +92,11 @@ create table EXAM (
    *  in that an exam entry should only mention modules
    *  that actually ran"
    */
-  constraint fk_exam_module_ran foreign key(Module_code, Exam_year) references HISTORY(Module_code, Delivery_year)
+  constraint fk_exam_module_ran foreign key(Module_code, Exam_year) references HISTORY(Module_code, Delivery_year),
+
+  /**
+   * Prevent dupes!
+   * We assume retakes are not possible per the spec.
+   */
+  constraint pk_exam_entry primary key(Module_code, Exam_year, Student_id)
 );
