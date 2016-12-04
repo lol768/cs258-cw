@@ -15,6 +15,7 @@ public class Assignment {
     public static class Worker {
         private static final String MODULE_NAME_COLUMN = "MODULE_NAME";
         private static final String STUDENT_NAME_COLUMN = "STUDENT_NAME";
+        private static final String ORGANISER_NAME_COLUMN = "ORGANISER_NAME";
         private final Connection connection;
 
         public Worker(Connection connection) {
@@ -67,6 +68,31 @@ public class Assignment {
             final ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 System.out.println(resultSet.getString(STUDENT_NAME_COLUMN));
+            }
+        }
+
+        public void printHarshestInstructors() throws SQLException {
+            //language=SQL
+            String sql = "select avg(score), ORGANISER_NAME from exam inner join HISTORY on EXAM.MODULE_CODE = " +
+                    "HISTORY.MODULE_CODE and EXAM.EXAM_YEAR = HISTORY.DELIVERY_YEAR group by ORGANISER_NAME order by " +
+                    "avg(score) asc";
+            final PreparedStatement ps = this.connection.prepareStatement(sql);
+            final ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(ORGANISER_NAME_COLUMN));
+            }
+        }
+
+        public void printLeafModules() throws SQLException {
+            String createdCol = "Leaf_Modules";
+            //language=SQL
+            String sql = "select listagg(MODULE_CODE, ' ') within group (order by module_code)" + createdCol + " from " +
+                    "(select MODULE.MODULE_CODE as MODULE_CODE from MODULE left outer join PREREQUISITES on MODULE" +
+                    ".MODULE_CODE = PREREQUISITES.MODULE_CODE where PREREQUISITE_CODE is null)";
+            final PreparedStatement ps = this.connection.prepareStatement(sql);
+            final ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                System.out.println(resultSet.getString(createdCol));
             }
         }
     }
@@ -195,6 +221,12 @@ public class Assignment {
                     break;
                 case 4:
                     this.worker.printTopStudents();
+                    break;
+                case 5:
+                    this.worker.printHarshestInstructors();
+                    break;
+                case 6:
+                    this.worker.printLeafModules();
                     break;
             }
         }

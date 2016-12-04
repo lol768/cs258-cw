@@ -100,3 +100,15 @@ create table EXAM (
    */
   constraint pk_exam_entry primary key(Module_code, Exam_year, Student_id)
 );
+
+/**
+ * Create the pre-requisites as
+ * described after option 5.
+ */
+create table PREREQUISITES (
+  Module_code varchar(6),
+  Prerequisite_code varchar(6),
+  constraint pk_prerequisite_entry primary key(Module_code, Prerequisite_code), /** Uniquely identifies an entry **/
+  constraint fk_prereqs_module_module_code foreign key(Module_code) references MODULE(Module_code), /** Ensure module is valid **/
+  constraint fk_prereqs_module_prereq_code foreign key(Prerequisite_code) references MODULE(Module_code) /** ensure its pre-req is too **/
+);

@@ -1,0 +1,3 @@
+select MODULE.MODULE_CODE AS MODULE_CODE from MODULE left outer join PREREQUISITES on MODULE.MODULE_CODE = PREREQUISITES.MODULE_CODE where PREREQUISITE_CODE is null;
+
+select listagg(MODULE_CODE, ' ') within group (order by module_code) Leaf_Modules from (select MODULE.MODULE_CODE AS MODULE_CODE from MODULE left outer join PREREQUISITES on MODULE.MODULE_CODE = PREREQUISITES.MODULE_CODE where PREREQUISITE_CODE is null);

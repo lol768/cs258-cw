@@ -28,7 +28,9 @@ insert into EXAM values ('0001', 'AG102', 2012, 100);
 
 insert into EXAM values ('0003', 'CS118', 2012, 90);
 
-COMMIT;
+insert into PREREQUISITES values ('AG102', 'AG101');
+
+commit;
 
 delete from MODULE;
 delete from STUDENT;
