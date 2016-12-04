@@ -6,7 +6,7 @@
  * are taken directly from the assignment document
  * and the fields just from the provided figure.
  */
-create table ADAM_STUDENT (
+create table STUDENT (
   Student_name varchar(30),
   Student_id char(4) primary key,
   Course_name varchar(30),
@@ -21,7 +21,7 @@ create table ADAM_STUDENT (
  * from the assignment document and the fields from the provided
  * figure.
  */
-create table ADAM_MODULE (
+create table MODULE (
   Module_name varchar(30),
   Module_code varchar(6) primary key,
   Department_name varchar(30)
@@ -35,7 +35,7 @@ create table ADAM_MODULE (
  * "HISTORY and EXAM records may only contain data about modules
  *  listed in MODULE..."
  */
-create table ADAM_HISTORY (
+create table HISTORY (
   /**
    * Standard fields using
    * the suggested data types.
@@ -47,7 +47,7 @@ create table ADAM_HISTORY (
   /**
    * Ensure the module code references a valid module (i.e. one defined in the module table).
    */
-  constraint fk_history_module_module_code foreign key(Module_code) references ADAM_MODULE(Module_code),
+  constraint fk_history_module_module_code foreign key(Module_code) references MODULE(Module_code),
 
   /**
    * An item in this table is uniquely identified by a composite key
@@ -66,7 +66,7 @@ create table ADAM_HISTORY (
  * the student is real and the module
  * is also valid.
  */
-create table ADAM_EXAM (
+create table EXAM (
   Student_id char(4),
   Module_code varchar(6),
   Exam_year smallint,
@@ -79,18 +79,18 @@ create table ADAM_EXAM (
    * "HISTORY and EXAM records may only contain data about [...]
    *  students from STUDENT"
    */
-  constraint fk_exam_student_student_id foreign key(Student_id) references ADAM_STUDENT(Student_id),
+  constraint fk_exam_student_student_id foreign key(Student_id) references STUDENT(Student_id),
 
   /**
    * "HISTORY and EXAM records may only contain data about modules
    *  listed in MODULE..."
    */
-  constraint fk_exam_module_module_code foreign key(Module_code) references ADAM_MODULE(Module_code),
+  constraint fk_exam_module_module_code foreign key(Module_code) references MODULE(Module_code),
 
   /**
    * "Similarly, EXAM and HISTORY should be consistent
    *  in that an exam entry should only mention modules
    *  that actually ran"
    */
-  constraint fk_exam_module_ran foreign key(Module_code, Exam_year) references ADAM_HISTORY(Module_code, Delivery_year)
+  constraint fk_exam_module_ran foreign key(Module_code, Exam_year) references HISTORY(Module_code, Delivery_year)
 );
