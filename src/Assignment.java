@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,6 +13,8 @@ public class Assignment {
     public static final String STUDENT_ID_COLUMN = "STUDENT_ID";
 
     public static class Worker {
+        private static final String MODULE_NAME_COLUMN = "MODULE_NAME";
+        private static final String STUDENT_NAME_COLUMN = "STUDENT_NAME";
         private final Connection connection;
 
         public Worker(Connection connection) {
@@ -21,12 +24,49 @@ public class Assignment {
         public void printModulesByStudent() throws SQLException {
             // LISTAGG possible since Oracle 11g release 2
             String createdCol = "MODULES";
+            //language=SQL
             String sql = String.format("select STUDENT_ID, LISTAGG(MODULE_CODE, ' ') within group (order by " +
                     "EXAM_YEAR) %s from EXAM group by STUDENT_ID", createdCol);
             final PreparedStatement ps = this.connection.prepareStatement(sql);
             final ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 System.out.println(resultSet.getString(STUDENT_ID_COLUMN) + ": " + resultSet.getString(createdCol));
+            }
+        }
+
+        public void printGhostModules() throws SQLException {
+            String createdCol = "MODULES";
+            //language=SQL
+            String sql = String.format("select listagg(MODULE_CODE, ' ') within group (order by module_code) %s from " +
+                    "(select MODULE_CODE from module minus (select distinct module_code from exam))", createdCol);
+            final PreparedStatement ps = this.connection.prepareStatement(sql);
+            final ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                System.out.println(resultSet.getString(createdCol));
+            }
+        }
+
+        public void printModulesByPopularity() throws SQLException {
+            //language=SQL
+            String sql = "select count(STUDENT_ID) as COUNT, MODULE_CODE, MODULE_NAME from EXAM natural join MODULE " +
+                    "group by MODULE_CODE, MODULE_NAME order by count desc";
+            final PreparedStatement ps = this.connection.prepareStatement(sql);
+            final ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(MODULE_NAME_COLUMN));
+            }
+        }
+
+        public void printTopStudents() throws SQLException {
+            //language=SQL
+            String sql = "select STUDENT_ID, STUDENT_NAME from EXAM natural join STUDENT group by STUDENT_ID, " +
+                    "STUDENT_NAME having avg(score) in (select max(AVG_SCORE) from (select " +
+                    "STUDENT_ID, avg(SCORE) as AVG_SCORE from EXAM " +
+                    "group by STUDENT_ID order by avg(SCORE) desc))";
+            final PreparedStatement ps = this.connection.prepareStatement(sql);
+            final ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(STUDENT_NAME_COLUMN));
             }
         }
     }
@@ -125,8 +165,9 @@ public class Assignment {
                     if (opt < 0 || opt > this.opts.size()) {
                         throw new IllegalArgumentException("Menu choice outside bounds.");
                     }
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException | InputMismatchException e) {
                     System.err.println("Invalid number supplied, please try again.\n");
+                    scanner.nextLine(); // eat up the \n (or \r\n if the user is on the wrong OS)
                     continue;
                 }
 
@@ -145,6 +186,15 @@ public class Assignment {
             switch (opt) {
                 case 1:
                     this.worker.printModulesByStudent();
+                    break;
+                case 2:
+                    this.worker.printGhostModules();
+                    break;
+                case 3:
+                    this.worker.printModulesByPopularity();
+                    break;
+                case 4:
+                    this.worker.printTopStudents();
                     break;
             }
         }

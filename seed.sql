@@ -14,11 +14,21 @@ insert into STUDENT values ('Joseph Bloggs', '0003', 'Computer Science', 3);
 insert into STUDENT values ('Matt Smith', '0004', 'French', 3);
 insert into STUDENT values ('Thomas Law', '0005', 'German Culture', 1);
 insert into HISTORY values ('AG101', 2011, 'JCB Ltd');
+insert into HISTORY values ('AG101', 2015, 'Oh Deere');
 insert into HISTORY values ('CS118', 2012, 'Steven Wright');
-insert into EXAM values ('0001', 'AG101', 2011, 0);
+insert into HISTORY values ('AG102', 2012, 'Mr Farm');
+insert into HISTORY values ('MA3J1', 2012, 'Mr Maths');
+insert into EXAM values ('0002', 'AG101', 2011, 0);
+insert into EXAM values ('0005', 'AG101', 2015, 0);
+
+insert into EXAM values ('0001', 'AG101', 2011, 100);
 insert into EXAM values ('0001', 'CS118', 2012, 50);
+insert into EXAM values ('0001', 'MA3J1', 2012, 250);
+insert into EXAM values ('0001', 'AG102', 2012, 100);
+
 insert into EXAM values ('0003', 'CS118', 2012, 90);
 
+COMMIT;
 
 delete from MODULE;
 delete from STUDENT;
